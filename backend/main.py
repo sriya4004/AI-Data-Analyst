@@ -2,13 +2,12 @@ from fastapi import FastAPI
 
 from backend.core.config import settings
 from backend.api.upload import router as upload_router
-from backend.api.sql_test import router as sql_router
 from backend.api.datasets import router as dataset_router
-from backend.api.query import router as query_router
-from backend.api.ai_test import router as ai_router
-from backend.api.analyst import router as analyst_router
-from backend.api.ai_sql import router as ai_sql_router
 from backend.api.insights import router as insights_router
+from backend.api.workflow import (
+    router as workflow_router
+)
+from backend.api.agent import router as agent_router
 
 app = FastAPI(
     title="AI Data Analyst Agent",
@@ -17,13 +16,10 @@ app = FastAPI(
 )
 
 app.include_router(upload_router)
-app.include_router(sql_router)
 app.include_router(dataset_router)
-app.include_router(query_router)
-app.include_router(ai_router)
-app.include_router(analyst_router)
-app.include_router(ai_sql_router)
 app.include_router(insights_router)
+app.include_router(workflow_router)
+app.include_router(agent_router)
 
 @app.get("/")
 def root():
