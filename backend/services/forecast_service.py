@@ -3,6 +3,7 @@ from prophet import Prophet
 from typing import Dict, Any, List
 import logging
 from backend.services.forecast_validator import ForecastValidator
+from backend.services.data_loader import DataLoader
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -27,7 +28,7 @@ class ForecastService:
             # 1. Retrieve dataset
             file_path = f"backend/uploads/{dataset_name}"
             try:
-                df = pd.read_csv(file_path)
+                df = DataLoader.load_dataset(file_path)
             except Exception as e:
                 return {
                     "status": "error",

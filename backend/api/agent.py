@@ -37,17 +37,12 @@ def run_agent(request: AgentRequest):
             )
 
         elif "forecasting" in task_type:
-            # VALIDATION: Forecasting specifically requires date and target columns
-            if not request.date_column or not request.target_column:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Forecasting tasks require 'date_column' and 'target_column' in the request."
-                )
-            
+            # Automatic column detection is handled internally by the Forecast Agent
             result = run_forecast_agent(
                 request.dataset_name,
                 request.date_column,
-                request.target_column
+                request.target_column,
+                request.question
             )
 
         else:
