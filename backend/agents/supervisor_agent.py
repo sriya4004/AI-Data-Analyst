@@ -7,9 +7,22 @@ INTENT_REGISTRY = {
         "sales prediction", "revenue prediction"
     ],
     "sql_analysis": [
-        "average", "sum", "count", "group", "highest", 
-        "lowest", "trend", "compare", "distribution", 
-        "show", "calculate"
+    "average",
+    "sum",
+    "count",
+    "group",
+    "highest",
+    "lowest",
+    "trend",
+    "compare",
+    "distribution",
+    "show",
+    "calculate",
+    "chart",
+    "graph",
+    "plot",
+    "visualize",
+    "visualization"
     ],
     "insight_generation": [
         "insight", "summary", "analyze", "overview", 
