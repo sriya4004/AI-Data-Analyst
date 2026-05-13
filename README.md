@@ -1,9 +1,8 @@
-````md
 # AI Data Analyst Agent
 
-An AI-powered Business Intelligence and Analytics Platform built using FastAPI, LangGraph, OpenRouter LLMs, DuckDB, and Multi-Agent AI Workflows.
+An AI-powered Business Intelligence and Analytics Platform built using FastAPI, LangGraph, OpenRouter LLMs, DuckDB, Prophet, and Multi-Agent AI Workflows.
 
-The platform allows users to upload CSV/Excel datasets, ask analytical questions in natural language, generate charts dynamically, obtain AI-driven business insights, and perform autonomous data analysis using specialized AI agents.
+The platform allows users to upload CSV/Excel datasets, ask analytical questions in natural language, generate charts dynamically, obtain AI-driven business insights, and perform autonomous data analysis and time-series forecasting using specialized AI agents.
 
 ---
 
@@ -26,6 +25,15 @@ The platform allows users to upload CSV/Excel datasets, ask analytical questions
 
 ---
 
+## AI Forecasting & Predictive Analytics
+- **Time-Series Forecasting**: Automated forecasting using Facebook Prophet.
+- **Trend Detection**: AI-driven analysis of upward, downward, and stable trends.
+- **Predictive Insights**: Natural-language business insights derived from forecast models.
+- **Confidence Intervals**: Visual representation of prediction uncertainty (95% CI).
+- **Automated Chart Config**: Frontend-ready JSON configurations for forecast visualizations.
+
+---
+
 ## Dynamic Visualization
 - AI-generated chart configurations
 - Automatic chart type selection
@@ -36,24 +44,16 @@ Supported chart types:
 - Line charts
 - Pie charts
 - Scatter plots
-
----
-
-## LangGraph Workflow System
-- Stateful workflow orchestration
-- Node-based analytical execution
-- Multi-step reasoning pipelines
-- Tool-integrated AI workflows
+- **Forecast charts** (with confidence intervals)
 
 ---
 
 ## Multi-Agent Architecture
-- Supervisor Agent
-- SQL Analysis Agent
-- Insight Generation Agent
-- Visualization Agent
-
-The Supervisor Agent intelligently routes user requests to specialized agents.
+- **Supervisor Agent**: Intelligently routes user requests based on intent classification.
+- **SQL Analysis Agent**: Generates and executes analytical SQL queries.
+- **Forecast Agent**: Orchestrates time-series predictions and trend analysis.
+- **Insight Generation Agent**: Produces descriptive business insights from data.
+- **Visualization Agent**: Determines the best visual representation for results.
 
 ---
 
@@ -64,35 +64,72 @@ The Supervisor Agent intelligently routes user requests to specialized agents.
 - Python
 - DuckDB
 - Pandas
-- LangChain
-- LangGraph
+- **Prophet** (Time-Series Forecasting)
+- LangChain / LangGraph
 - OpenRouter API
-- OpenAI SDK
 
 ---
 
 ## AI & Analytics
-- OpenRouter LLMs
+- OpenRouter LLMs (GPT-4o / Claude 3.5 Sonnet)
 - Multi-Agent AI Architecture
 - Workflow Orchestration
 - KPI Grounding
-- AI-driven SQL Generation
+- AI-driven SQL & Insight Generation
 
 ---
 
-## Forecasting & ML (Upcoming)
-- Prophet
-- Scikit-learn
-- XGBoost
+# AI Forecasting & Predictive Analytics
 
----
+The platform features a specialized forecasting subsystem designed to provide stakeholders with future-looking metrics.
 
-## Frontend (Upcoming)
-- Next.js
-- Tailwind CSS
-- ShadCN UI
-- Recharts
-- Framer Motion
+### Forecasting Architecture
+The forecasting system operates as a specialized agent-led workflow:
+1. **Intent Classification**: The Supervisor Agent detects forecasting intent (keywords: *forecast, predict, future, projection*).
+2. **Validation**: The system ensures the dataset contains valid date and numeric columns.
+3. **Modeling**: The Forecast Service utilizes **Facebook Prophet** for robust time-series modeling, handling seasonality and outliers automatically.
+4. **Insight Generation**: The Forecast Insight Service analyzes the model's slope and generates a natural-language business narrative.
+5. **Visualization**: The Forecast Chart Service produces a JSON configuration including predictions and confidence intervals for frontend rendering.
+
+### Capabilities
+- **Revenue & Sales Prediction**: Predict future financial performance based on historical data.
+- **Confidence Interval Analysis**: Understand the upper and lower bounds of predictions.
+- **Automated Trend Detection**: Immediate identification of growth, decline, or stability.
+
+### API Request Example
+```http
+POST /agent
+Content-Type: application/json
+
+{
+    "dataset_name": "sales_data.csv",
+    "question": "Predict our revenue for the next 30 days",
+    "date_column": "order_date",
+    "target_column": "revenue"
+}
+```
+
+### API Response Example
+```json
+{
+    "task_type": "forecasting",
+    "result": {
+        "status": "success",
+        "agent": "Forecast Agent",
+        "dataset": "sales_data.csv",
+        "target_column": "revenue",
+        "insight": "Revenue is expected to increase over the next 30 days based on a strong upward trend.",
+        "forecast": [...],
+        "chart_config": {
+            "type": "forecast_chart",
+            "datasets": [
+                { "label": "Predicted Value", "data": [105.2, 108.4, ...] },
+                { "label": "Confidence Interval", "data": [{"low": 98.1, "high": 112.3}, ...] }
+            ]
+        }
+    }
+}
+```
 
 ---
 
@@ -107,31 +144,13 @@ FastAPI APIs
  ↓
 Supervisor Agent
  ↓
-Specialized Agents
+Specialized Agents (SQL, Forecast, Insight, Viz)
  ↓
 LangGraph Workflows
  ↓
-Services
+Services (Prophet, DuckDB, LLM)
  ↓
-DuckDB + Datasets
-````
-
----
-
-# Current Agent Architecture
-
-```text
-Supervisor Agent
-    ↓
-SQL Agent
-    ↓
-Workflow Graph
-    ↓
-KPI Extraction
-    ↓
-Insight Generation
-    ↓
-Visualization Agent
+Datasets
 ```
 
 ---
@@ -140,250 +159,74 @@ Visualization Agent
 
 ```text
 backend/
-│
 ├── agents/
 │   ├── supervisor_agent.py
 │   ├── sql_agent.py
+│   ├── forecast_agent.py          # NEW: Orchestrates forecasting tasks
 │   ├── insight_agent.py
 │   └── visualization_agent.py
 │
 ├── api/
-│   ├── upload.py
-│   ├── datasets.py
-│   ├── insights.py
-│   ├── workflow.py
-│   └── agent.py
-│
-├── core/
-│   ├── config.py
-│   ├── dataset_registry.py
-│   └── duckdb_instance.py
+│   └── agent.py                   # Main entry point for AI agents
 │
 ├── services/
-│   ├── data_loader.py
+│   ├── forecast_service.py        # NEW: Prophet model execution
+│   ├── forecast_validator.py      # NEW: Input validation for forecasting
+│   ├── forecast_insight_service.py # NEW: Trend & NL insight generation
+│   ├── forecast_chart_service.py   # NEW: Frontend-ready chart configs
 │   ├── llm_service.py
 │   ├── visualization_service.py
-│   ├── insight_service.py
-│   └── kpi_service.py
+│   └── insight_service.py
 │
-├── tools/
-│   └── duckdb_tool.py
-│
-├── workflows/
-│   ├── state.py
-│   ├── nodes.py
-│   └── analyst_workflow.py
-│
-├── uploads/
-│
-└── main.py
+├── main.py
 ```
 
 ---
 
-# Installation
+# Installation & Setup
 
-## Clone Repository
-
-```bash
-git clone <repo-url>
-cd ai-data-analyst-agent
-```
-
----
-
-## Create Virtual Environment
-
-```bash
-python -m venv venv
-```
-
-Activate environment:
-
-### Windows
-
-```bash
-venv\Scripts\activate
-```
-
-### Linux/Mac
-
-```bash
-source venv/bin/activate
-```
-
----
-
-## Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-# Environment Variables
-
-Create a `.env` file:
-
-```env
-OPENROUTER_API_KEY=your_api_key
-MODEL_NAME=openai/gpt-4.1-mini
-```
-
----
-
-# Run Backend
-
-```bash
-uvicorn backend.main:app --reload
-```
-
-Backend:
-
-```text
-http://127.0.0.1:8000
-```
-
-Swagger Docs:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
----
-
-# Main APIs
-
-## Upload Dataset
-
-```http
-POST /upload
-```
-
----
-
-## List Datasets
-
-```http
-GET /datasets
-```
-
----
-
-## Generate Insights
-
-```http
-GET /generate-insights
-```
-
----
-
-## Workflow Analysis
-
-```http
-POST /workflow-analysis
-```
-
----
-
-## Multi-Agent Analysis
-
-```http
-POST /agent
-```
-
----
-
-# Example Queries
-
-```text
-Show average IQ by placement status
-```
-
-```text
-Generate insights about this dataset
-```
-
-```text
-Show monthly sales trends
-```
-
-```text
-Predict future revenue
-```
+1. **Clone & Install**:
+   ```bash
+   git clone <repo-url>
+   pip install -r requirements.txt
+   ```
+2. **Environment**:
+   Set `OPENROUTER_API_KEY` in your `.env` file.
+3. **Run**:
+   ```bash
+   uvicorn backend.main:app --reload
+   ```
 
 ---
 
 # Current Completed Features
-
-* Dataset Upload System
-* SQL Analytics Engine
-* AI-generated SQL Queries
-* Dynamic Visualization Configuration
-* LangGraph Workflows
-* Multi-Agent Routing
-* KPI Grounding
-* AI Business Insights
-
----
-
-# Upcoming Features
-
-* Forecast Agent
-* Autonomous Dashboard Generation
-* Persistent Memory
-* Executive Report Generation
-* Azure Deployment
-* Conversational Analytics Frontend
+* Dataset Upload & Registry
+* Multi-Agent Intent Routing
+* AI-Generated SQL Analytics (DuckDB)
+* **AI Forecasting & Predictive Analytics (Prophet)**
+* **Natural-Language Forecast Insights**
+* **Dynamic Forecast Chart Configurations**
+* LangGraph Workflow Orchestration
+* Business Insight Generation
 
 ---
 
 # Team Responsibilities
 
-## Atia Naim
+### Atia Naim
+* AI Backend Architecture & Multi-Agent System
+* LangGraph Workflow Orchestration
 
-* AI Backend Architecture
-* LangGraph Workflows
-* Multi-Agent System
-* AI Analytics Engine
-* Workflow Orchestration
+### Sriya Pandey
+* **Forecasting & Predictive Analytics**
+* Prophet Integration & Statistical Intelligence
+* Trend Analysis & Insight Logic
 
----
-
-## Sriya Pandey
-
-* Forecasting & Predictive Analytics
-* Prophet Integration
-* Statistical Intelligence
-* Advanced KPI Analysis
-
----
-
-## Amaan Shahid
-
-* Frontend Dashboard
-* API Integration
-* Azure Deployment
-* UI/UX Development
-
----
-
-# Future Vision
-
-The project aims to evolve into a complete AI-powered Business Intelligence platform combining:
-
-* Conversational Analytics
-* Autonomous Agents
-* Predictive Forecasting
-* AI-generated Dashboards
-* Executive Intelligence Systems
+### Amaan Shahid
+* Frontend Dashboard & UI/UX Development
+* API Integration & Deployment
 
 ---
 
 # License
-
 MIT License
-
-```
-```

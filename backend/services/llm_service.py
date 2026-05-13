@@ -1,44 +1,41 @@
-from openai import OpenAI
+import google.generativeai as genai
+import os
+from dotenv import load_dotenv
 
 from backend.core.config import settings
 
+# Configure Gemini API using settings
+if not settings.GEMINI_API_KEY:
+    raise ValueError("GEMINI_API_KEY not found in environment variables")
 
-client = OpenAI(
-    base_url="https://openrouter.ai/api/v1",
-    api_key=settings.OPENROUTER_API_KEY
+genai.configure(api_key=settings.GEMINI_API_KEY)
+
+# Load model using settings
+model = genai.GenerativeModel(
+    model_name=settings.MODEL_NAME or "gemini-1.5-flash"
 )
-
 
 def generate_response(prompt: str):
 
-    completion = client.chat.completions.create(
-    model=settings.MODEL_NAME,
-    messages=[
-        {
-            "role": "system",
-            "content": """
-            You are an expert AI Data Analyst.
+    full_prompt = f"""
+    You are an expert AI Data Analyst.
 
-            Your job is to:
-            - analyze datasets
-            - generate business insights
-            - explain trends
-            - identify anomalies
-            - summarize findings clearly
+    Your job is to:
+    - analyze datasets
+    - generate business insights
+    - explain trends
+    - identify anomalies
+    - summarize findings clearly
 
-            Keep responses:
-            - structured
-            - concise
-            - insightful
-            """
-        },
-        {
-            "role": "user",
-            "content": prompt
-        }
-    ],
-    max_tokens=700,
-    temperature=0.3
-    )
+    Keep responses:
+    - structured
+    - concise
+    - insightful
 
-    return completion.choices[0].message.content
+    User Dataset Analysis Request:
+    {prompt}
+    """
+
+    response = model.generate_content(full_prompt)
+
+    return response.text
