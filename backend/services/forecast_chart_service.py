@@ -2,53 +2,30 @@ from typing import List, Dict, Any
 
 class ForecastChartService:
     """
-    A service for generating frontend-ready chart configurations 
-    specifically for time-series forecasting data.
+    Service for generating frontend-ready chart configurations for forecasting.
     """
 
     @staticmethod
-    def generate_chart_config(
-        forecast_records: List[Dict[str, Any]], 
-        target_column: str
-    ) -> Dict[str, Any]:
-        """
-        Transforms raw forecast records into a structured JSON configuration 
-        compatible with modern frontend charting libraries (Chart.js, Recharts, etc.)
-        
-        Includes:
-        - Labels (dates)
-        - Predicted values (yhat)
-        - Confidence intervals (yhat_lower, yhat_upper)
-        """
+    def generate_chart_config(forecast_records: List[Dict[str, Any]], target_column: str) -> Dict[str, Any]:
         if not forecast_records:
-            return {
-                "error": "No forecast data available to generate chart configuration."
-            }
+            return {"error": "No forecast data available."}
 
-        # Extracting the series
-        # We ensure dates are in string format for JSON compatibility
         labels = [str(r['ds']) for r in forecast_records]
-        predicted_values = [round(r['yhat'], 2) for r in forecast_records]
-        lower_bounds = [round(r['yhat_lower'], 2) for r in forecast_records]
-        upper_bounds = [round(r['yhat_upper'], 2) for r in forecast_records]
+        yhat = [round(r['yhat'], 2) for r in forecast_records]
+        yhat_lower = [round(r['yhat_lower'], 2) for r in forecast_records]
+        yhat_upper = [round(r['yhat_upper'], 2) for r in forecast_records]
 
-        # Constructing the frontend-ready configuration
-        chart_config = {
+        return {
             "type": "forecast_chart",
             "title": f"Forecast Projection for {target_column}",
-            "xAxis": {
-                "label": "Date",
-                "data": labels
-            },
-            "yAxis": {
-                "label": target_column
-            },
+            "xAxis": {"label": "Date", "data": labels},
+            "yAxis": {"label": target_column},
             "datasets": [
                 {
                     "id": "prediction",
                     "label": "Predicted Value",
-                    "data": predicted_values,
-                    "borderColor": "#6366f1",  # Indigo
+                    "data": yhat,
+                    "borderColor": "#6366f1",
                     "backgroundColor": "rgba(99, 102, 241, 0.1)",
                     "borderWidth": 3,
                     "pointRadius": 2,
@@ -57,29 +34,22 @@ class ForecastChartService:
                 {
                     "id": "confidence_interval",
                     "label": "95% Confidence Interval",
-                    "data": [
-                        {"low": low, "high": high} 
-                        for low, high in zip(lower_bounds, upper_bounds)
-                    ],
+                    "data": [{"low": l, "high": h} for l, h in zip(yhat_lower, yhat_upper)],
                     "backgroundColor": "rgba(99, 102, 241, 0.2)",
                     "borderWidth": 0,
                     "fill": True,
                     "isArea": True
                 }
             ],
-            # Helper for frontends that prefer a combined format for tooltips
             "combinedData": [
                 {
                     "date": labels[i],
-                    "predicted": predicted_values[i],
-                    "lower": lower_bounds[i],
-                    "upper": upper_bounds[i]
+                    "predicted": yhat[i],
+                    "lower": yhat_lower[i],
+                    "upper": yhat_upper[i]
                 }
                 for i in range(len(labels))
             ]
         }
 
-        return chart_config
-
-# Reusable instance
 forecast_chart_service = ForecastChartService()

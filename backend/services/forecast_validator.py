@@ -2,132 +2,61 @@ import pandas as pd
 import logging
 from typing import Dict, Any, Optional
 
-# Configure logging
 logger = logging.getLogger(__name__)
 
 class ForecastValidationError(Exception):
-    """Custom exception for forecasting validation failures."""
     def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
         super().__init__(message)
         self.details = details or {}
 
 class ForecastValidator:
     """
-    Enterprise-grade validation utilities for forecasting tasks.
-    Ensures data integrity and prevents Prophet execution failures.
+    Validation utilities for forecasting tasks to ensure data integrity.
     """
 
     @staticmethod
-    def validate_dataset(
-        df: pd.DataFrame, 
-        date_column: str, 
-        target_column: str
-    ) -> Dict[str, Any]:
-        """
-        Validates the dataset against forecasting requirements.
-        
-        Returns:
-            Dict containing validation status and details.
-        """
+    def validate_dataset(df: pd.DataFrame, date_column: str, target_column: str) -> Dict[str, Any]:
         try:
-            # 1. Check if dataset is empty or None
             if df is None or df.empty:
-                raise ForecastValidationError("The provided dataset is empty or could not be loaded.")
+                raise ForecastValidationError("The dataset is empty.")
 
-            # 2. Check for column existence
-            missing_cols = []
-            if date_column not in df.columns:
-                missing_cols.append(date_column)
-            if target_column not in df.columns:
-                missing_cols.append(target_column)
-            
+            missing_cols = [col for col in [date_column, target_column] if col not in df.columns]
             if missing_cols:
-                raise ForecastValidationError(
-                    f"Required columns missing: {', '.join(missing_cols)}",
-                    {"missing_columns": missing_cols}
-                )
+                raise ForecastValidationError(f"Missing columns: {', '.join(missing_cols)}", {"missing": missing_cols})
 
-            # 3. Numeric validation for target column
-            # We try to convert a sample to see if it's numeric-compatible
-            sample_target = df[target_column].dropna()
-            if sample_target.empty:
-                 raise ForecastValidationError(f"Target column '{target_column}' is completely empty.")
+            target_sample = df[target_column].dropna()
+            if target_sample.empty:
+                raise ForecastValidationError(f"Target column '{target_column}' is empty.")
             
             try:
-                pd.to_numeric(sample_target.head(100))
+                pd.to_numeric(target_sample.head(100))
             except (ValueError, TypeError):
-                raise ForecastValidationError(
-                    f"Target column '{target_column}' must be numeric.",
-                    {"current_type": str(df[target_column].dtype)}
-                )
+                raise ForecastValidationError(f"Target column '{target_column}' must be numeric.")
 
-            # 4. Datetime validation for date column
-            sample_dates = df[date_column].dropna()
-            if sample_dates.empty:
-                raise ForecastValidationError(f"Date column '{date_column}' is completely empty.")
+            date_sample = df[date_column].dropna()
+            if date_sample.empty:
+                raise ForecastValidationError(f"Date column '{date_column}' is empty.")
                 
             try:
-                pd.to_datetime(sample_dates.head(100))
+                pd.to_datetime(date_sample.head(100))
             except (ValueError, TypeError):
-                raise ForecastValidationError(
-                    f"Date column '{date_column}' must contain valid date/time strings.",
-                    {"column": date_column}
-                )
+                raise ForecastValidationError(f"Date column '{date_column}' must contain valid dates.")
 
-            # 5. Data density validation (Prophet requirement)
-            clean_df = df[[date_column, target_column]].dropna()
-            if len(clean_df) < 2:
-                raise ForecastValidationError(
-                    "Insufficient data for forecasting. Minimum 2 non-null rows required.",
-                    {"clean_row_count": len(clean_df)}
-                )
+            if len(df[[date_column, target_column]].dropna()) < 2:
+                raise ForecastValidationError("Insufficient data. Minimum 2 non-null rows required.")
 
-            logger.info(f"Forecasting validation passed for {target_column}")
-            return {
-                "is_valid": True,
-                "status": "success",
-                "message": "Dataset validated successfully."
-            }
+            return {"is_valid": True, "status": "success", "message": "Validated successfully."}
 
         except ForecastValidationError as ve:
-            logger.warning(f"Validation Error: {str(ve)}")
-            return {
-                "is_valid": False,
-                "status": "error",
-                "error_type": "validation_failure",
-                "message": str(ve),
-                "details": ve.details
-            }
+            return {"is_valid": False, "status": "error", "error_type": "validation_failure", "message": str(ve), "details": ve.details}
         except Exception as e:
-            logger.exception("Unexpected error during forecasting validation.")
-            return {
-                "is_valid": False,
-                "status": "error",
-                "error_type": "system_failure",
-                "message": f"An internal error occurred during validation: {str(e)}"
-            }
+            logger.error(f"Validation error: {e}")
+            return {"is_valid": False, "status": "error", "error_type": "system_failure", "message": str(e)}
 
     @staticmethod
-    def prepare_prophet_df(
-        df: pd.DataFrame, 
-        date_column: str, 
-        target_column: str
-    ) -> pd.DataFrame:
-        """
-        Converts a validated dataframe into Prophet's required 'ds' and 'y' format.
-        """
-        # Create a copy with only needed columns
+    def prepare_prophet_df(df: pd.DataFrame, date_column: str, target_column: str) -> pd.DataFrame:
         df_prophet = df[[date_column, target_column]].copy()
-        
-        # Rename columns to Prophet standards
-        df_prophet = df_prophet.rename(columns={
-            date_column: 'ds',
-            target_column: 'y'
-        })
-        
-        # Final type enforcement
+        df_prophet = df_prophet.rename(columns={date_column: 'ds', target_column: 'y'})
         df_prophet['ds'] = pd.to_datetime(df_prophet['ds'])
         df_prophet['y'] = pd.to_numeric(df_prophet['y'], errors='coerce')
-        
-        # Remove any rows that became invalid during conversion (e.g. invalid dates)
         return df_prophet.dropna(subset=['ds', 'y'])
