@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from backend.services.insight_service import generate_dataset_insights
+from services.insight_service import generate_dataset_insights
 
 router = APIRouter()
 

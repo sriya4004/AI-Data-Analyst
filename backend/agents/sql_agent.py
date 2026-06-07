@@ -1,5 +1,5 @@
-from backend.workflows.analyst_workflow import analyst_graph
-from backend.agents.visualization_agent import run_visualization_agent
+from workflows.analyst_workflow import analyst_graph
+from agents.visualization_agent import run_visualization_agent
 
 def run_sql_agent(dataset_name, question):
     """

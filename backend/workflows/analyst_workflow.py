@@ -1,7 +1,7 @@
 from langgraph.graph import StateGraph, END
 
-from backend.workflows.state import AnalystState
-from backend.workflows.nodes import (
+from workflows.state import AnalystState
+from workflows.nodes import (
     schema_node,
     sql_generation_node,
     sql_execution_node,

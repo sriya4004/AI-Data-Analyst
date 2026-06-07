@@ -1,11 +1,11 @@
 import logging
 import pandas as pd
 from typing import Dict, Any, Optional
-from backend.services.forecast_service import generate_forecast
-from backend.services.forecast_insight_service import forecast_insight_service
-from backend.services.forecast_chart_service import forecast_chart_service
-from backend.services.data_loader import DataLoader
-from backend.services.auto_column_detection_service import auto_column_detection_service
+from services.forecast_service import generate_forecast
+from services.forecast_insight_service import forecast_insight_service
+from services.forecast_chart_service import forecast_chart_service
+from services.data_loader import DataLoader
+from services.auto_column_detection_service import auto_column_detection_service
 
 logger = logging.getLogger(__name__)
 

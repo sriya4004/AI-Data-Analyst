@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from backend.core.dataset_registry import DatasetRegistry
+from core.dataset_registry import DatasetRegistry
 
 router = APIRouter()
 

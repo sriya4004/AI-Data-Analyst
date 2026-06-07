@@ -1,6 +1,6 @@
 import logging
 from typing import List, Dict, Any
-from backend.services.llm_service import generate_response
+from services.llm_service import generate_response
 
 logger = logging.getLogger(__name__)
 

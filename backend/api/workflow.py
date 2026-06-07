@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from backend.workflows.analyst_workflow import analyst_graph
+from workflows.analyst_workflow import analyst_graph
 
 router = APIRouter()
 

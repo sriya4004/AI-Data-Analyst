@@ -1,5 +1,5 @@
 import json
-from backend.services.llm_service import generate_response
+from services.llm_service import generate_response
 
 def generate_chart_config(user_question, query_result):
     """

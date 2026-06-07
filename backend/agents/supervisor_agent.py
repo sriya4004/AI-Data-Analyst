@@ -1,4 +1,4 @@
-from backend.services.llm_service import generate_response
+from services.llm_service import generate_response
 
 INTENT_REGISTRY = {
     "forecasting": [

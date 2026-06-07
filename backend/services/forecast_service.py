@@ -2,8 +2,8 @@ import logging
 import pandas as pd
 from prophet import Prophet
 from typing import Dict, Any
-from backend.services.forecast_validator import ForecastValidator
-from backend.services.data_loader import DataLoader
+from services.forecast_validator import ForecastValidator
+from services.data_loader import DataLoader
 
 logger = logging.getLogger(__name__)
 

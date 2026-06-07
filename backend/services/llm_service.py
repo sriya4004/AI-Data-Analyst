@@ -1,5 +1,5 @@
 import google.generativeai as genai
-from backend.core.config import settings
+from core.config import settings
 
 if not settings.GEMINI_API_KEY:
     raise ValueError("GEMINI_API_KEY not found in environment variables")

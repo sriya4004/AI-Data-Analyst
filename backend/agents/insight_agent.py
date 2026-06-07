@@ -1,4 +1,4 @@
-from backend.services.insight_service import generate_dataset_insights
+from services.insight_service import generate_dataset_insights
 
 def run_insight_agent(dataset_name):
     """

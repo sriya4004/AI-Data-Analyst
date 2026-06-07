@@ -1,8 +1,8 @@
-from backend.core.dataset_registry import DatasetRegistry
-from backend.services.data_loader import DataLoader
-from backend.services.llm_service import generate_response
-from backend.core.duckdb_instance import duckdb_instance
-from backend.services.kpi_service import (
+from core.dataset_registry import DatasetRegistry
+from services.data_loader import DataLoader
+from services.llm_service import generate_response
+from core.duckdb_instance import duckdb_instance
+from services.kpi_service import (
     extract_kpis
 )
 

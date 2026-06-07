@@ -1,9 +1,9 @@
 import os
 import shutil
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from backend.services.data_loader import DataLoader
-from backend.core.dataset_registry import DatasetRegistry
-from backend.core.duckdb_instance import duckdb_instance
+from services.data_loader import DataLoader
+from core.dataset_registry import DatasetRegistry
+from core.duckdb_instance import duckdb_instance
 
 router = APIRouter()
 UPLOAD_DIR = "backend/uploads"

@@ -1,6 +1,6 @@
-from backend.core.dataset_registry import DatasetRegistry
-from backend.services.data_loader import DataLoader
-from backend.services.llm_service import generate_response
+from core.dataset_registry import DatasetRegistry
+from services.data_loader import DataLoader
+from services.llm_service import generate_response
 
 def generate_dataset_insights(dataset_name: str):
     """

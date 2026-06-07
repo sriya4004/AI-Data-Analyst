@@ -2,10 +2,10 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 
-from backend.agents.supervisor_agent import classify_request
-from backend.agents.sql_agent import run_sql_agent
-from backend.agents.insight_agent import run_insight_agent
-from backend.agents.forecast_agent import run_forecast_agent
+from agents.supervisor_agent import classify_request
+from agents.sql_agent import run_sql_agent
+from agents.insight_agent import run_insight_agent
+from agents.forecast_agent import run_forecast_agent
 
 router = APIRouter()
 
